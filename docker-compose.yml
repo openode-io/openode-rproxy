@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.5
+    # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      - "443:443"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+
+    volumes:
+      - $PWD/traefik.yml:/etc/traefik/traefik.yml
+      - $PWD/configs/:/configs/
+      - $PWD/certs/:/certs/
+
+  rproxy:
+    image: ruby:3.0.2
+    build:
+      context: .
+
+    command: "ruby server.rb"
+
+    volumes:
+        - $PWD/configs/:/configs/
+        - $PWD/certs/:/certs/

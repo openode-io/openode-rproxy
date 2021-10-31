@@ -1,0 +1,18 @@
+providers:
+  file:
+    directory: /configs
+    watch: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+  websecure:
+    address: ":443"
+
+api:
+  insecure: true
+
+log:
+  level: DEBUG
+
