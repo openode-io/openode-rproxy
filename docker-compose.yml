@@ -19,6 +19,8 @@ services:
 
   rproxy:
     image: ruby:3.0.2
+    env_file:
+      - ./.env
     build:
       context: .
 
