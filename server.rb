@@ -5,7 +5,7 @@ require 'json'
 
 
 LOOP_SYNC_INTERVAL = (ENV["LOOP_SYNC_INTERVAL"] || 30).to_i
-OPENODE_API_URL = ENV["OPENODE_API_URL"] || "http://localhost:3000/"
+OPENODE_API_URL = ENV["OPENODE_API_URL"] || "http://localhost:3000"
 OPENODE_API_TOKEN = ENV["OPENODE_API_TOKEN"]
 CONFIGS_PATH = ENV["CONFIGS_PATH"] || "./configs"
 
@@ -27,6 +27,12 @@ def http_get(url, headers = nil)
   HTTParty.get(url, :headers => headers).body
 end
 
+def http_patch(url, body, headers = nil)
+  uri = URI(url)
+
+  HTTParty.patch(url, :headers => headers, body: body).body
+end
+
 # openode
 
 def openode_get(path)
@@ -38,8 +44,31 @@ def openode_get(path)
   )
 end
 
+def openode_patch(path, body)
+  log("Openode patch #{path}")
+
+  return JSON.parse(
+    http_patch(
+      "#{OPENODE_API_URL}#{path}",
+      body,
+      headers={"x-auth-token" => OPENODE_API_TOKEN}
+    )
+  )
+end
+
 def openode_load_balancer_requiring_sync
   openode_get("/super_admin/website_locations/load_balancer_requiring_sync")
+end
+
+def openode_set_load_balancer_synced(website_location_id)
+  openode_patch(
+    "/super_admin/website_locations/#{website_location_id}",
+    {
+      "website_location" => {
+        "load_balancer_synced" => true
+      }
+    }
+  )
 end
 
 ### Main
@@ -60,6 +89,8 @@ loop do
     file_path = "#{CONFIGS_PATH}/#{website_id}-#{website_location_id}.yml"
     File.open(file_path, 'w') { |file| file.write(data) }
     log("[+] Wrote #{file_path}")
+
+    openode_set_load_balancer_synced(website_location_id)
   end
 
   sleep LOOP_SYNC_INTERVAL

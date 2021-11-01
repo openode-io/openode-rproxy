@@ -1,0 +1,22 @@
+
+<% if @website_location.dig("cert")&.present? %>
+tls:
+  certificates:
+    - certFile: /certs/gcloudruntest2.cert
+      keyFile: /certs/gcloudruntest2.key
+<% end %>
+
+http:
+  routers:
+    website-location-<%= @website_location["id"] %>-https:
+      rule: "Host(`gcloudruntest2.cronrobot.io`)"
+      service: "service-website-location-<%= @website_location["id"] %>"
+      tls: {}
+
+  services:
+    service-website-location-<%= @website_location["id"] %>:
+      loadBalancer:
+        passHostHeader: false
+        servers:
+        - url: "<%= @website_location["backend_url"] %>"
+
