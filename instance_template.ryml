@@ -1,9 +1,11 @@
 
-<% if @website_location.dig("cert")&.present? %>
+<% if @website_location.dig("gcloud_ssl_cert_url") && 
+      @website_location.dig("gcloud_ssl_key_url")
+%>
 tls:
   certificates:
-    - certFile: /certs/gcloudruntest2.cert
-      keyFile: /certs/gcloudruntest2.key
+    - certFile: /certs/<%= @website_location.dig("website_id") %>.cert
+      keyFile: /certs/<%= @website_location.dig("website_id") %>.key
 <% end %>
 
 http:

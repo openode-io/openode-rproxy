@@ -13,9 +13,6 @@ CONFIGS_PATH = ENV["CONFIGS_PATH"] || "./configs"
 
 ### General utils
 
-puts system("gsutil cp #{GSTORAGE_BUCKET}/167.cert #{LOCAL_CERTS_PATH}/167.cert")
-asdf
-
 def log(msg)
   $stdout.sync = true
   puts "#{Time.now} [INFO] - #{msg}"
@@ -76,6 +73,29 @@ def openode_set_load_balancer_synced(website_location_id)
   )
 end
 
+# gstorage
+
+def gstorage_cp(from, to)
+  #system("gsutil cp #{GSTORAGE_BUCKET}/167.cert #{LOCAL_CERTS_PATH}/167.cert")
+  cmd = "gsutil cp #{from} #{to}"
+  log("gstorage: #{cmd}")
+
+  system(cmd)
+end
+
+def sync_certs(website_location)
+  wl = website_location
+
+  sync_cert(wl["gcloud_ssl_cert_url"], "#{wl["website_id"]}.cert")
+  sync_cert(wl["gcloud_ssl_key_url"], "#{wl["website_id"]}.key")
+end
+
+def sync_cert(url, filename)
+  if url
+    gstorage_cp("#{GSTORAGE_BUCKET}/#{filename}", "#{LOCAL_CERTS_PATH}/#{filename}")
+  end
+end
+
 ### Main
 
 log("Booting with sync interval #{LOOP_SYNC_INTERVAL}")
@@ -85,7 +105,9 @@ loop do
 
   openode_load_balancer_requiring_sync.each do |website_location|
     wl = website_location
-    puts "wl = #{wl.inspect}"
+
+    sync_certs(wl)
+
     engine = InstanceTemplateEngine.new(website_location)
 
     data = engine.render
@@ -96,7 +118,7 @@ loop do
     File.open(file_path, 'w') { |file| file.write(data) }
     log("[+] Wrote #{file_path}")
 
-    # openode_set_load_balancer_synced(website_location_id)
+    openode_set_load_balancer_synced(website_location_id)
   end
 
   sleep LOOP_SYNC_INTERVAL
