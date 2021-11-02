@@ -16,3 +16,9 @@ api:
 log:
   level: DEBUG
 
+http:
+  middlewares:
+    limit:
+      buffering:
+        maxResponseBodyBytes: 10000000
+        maxRequestBodyBytes: 10000000

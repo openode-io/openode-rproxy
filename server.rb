@@ -7,9 +7,14 @@ require 'json'
 LOOP_SYNC_INTERVAL = (ENV["LOOP_SYNC_INTERVAL"] || 30).to_i
 OPENODE_API_URL = ENV["OPENODE_API_URL"] || "http://localhost:3000"
 OPENODE_API_TOKEN = ENV["OPENODE_API_TOKEN"]
+GSTORAGE_BUCKET = ENV["GSTORAGE_BUCKET"] || "gs://instance-certs"
+LOCAL_CERTS_PATH = ENV["LOCAL_CERTS_PATH"] || "./certs"
 CONFIGS_PATH = ENV["CONFIGS_PATH"] || "./configs"
 
 ### General utils
+
+puts system("gsutil cp #{GSTORAGE_BUCKET}/167.cert #{LOCAL_CERTS_PATH}/167.cert")
+asdf
 
 def log(msg)
   $stdout.sync = true
@@ -80,6 +85,7 @@ loop do
 
   openode_load_balancer_requiring_sync.each do |website_location|
     wl = website_location
+    puts "wl = #{wl.inspect}"
     engine = InstanceTemplateEngine.new(website_location)
 
     data = engine.render
@@ -90,7 +96,7 @@ loop do
     File.open(file_path, 'w') { |file| file.write(data) }
     log("[+] Wrote #{file_path}")
 
-    openode_set_load_balancer_synced(website_location_id)
+    # openode_set_load_balancer_synced(website_location_id)
   end
 
   sleep LOOP_SYNC_INTERVAL
