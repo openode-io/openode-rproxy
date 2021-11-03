@@ -11,7 +11,7 @@ tls:
 http:
   routers:
     website-location-<%= @website_location["id"] %>-https:
-      rule: "Host(`gcloudruntest2.cronrobot.io`)"
+      rule: "Host(<%= @website_location["hosts"].map { |h| "`#{h}`" }.join(", ") %>)"
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
 
