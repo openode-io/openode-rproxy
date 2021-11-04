@@ -1,0 +1,16 @@
+name: End-to-end
+
+on:
+  push:
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      
+      -
+        name: boot
+        run: |
+          ls
