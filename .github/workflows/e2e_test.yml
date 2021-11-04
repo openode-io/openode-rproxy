@@ -13,4 +13,9 @@ jobs:
       -
         name: boot
         run: |
-          ls
+          cp .test.env .env
+
+          docker-compose up -d --build
+          sleep 10
+
+          docker ps -a
