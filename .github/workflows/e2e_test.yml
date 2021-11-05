@@ -15,8 +15,9 @@ jobs:
         run: |
           cp .test.env .env
 
-          docker-compose up -d --build
           node test/openode_api.js &
+          sleep 5
+          docker-compose up -d --build
           sleep 10
 
           docker-compose logs
