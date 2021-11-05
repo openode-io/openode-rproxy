@@ -14,6 +14,8 @@ jobs:
         name: boot
         run: |
           cp .test.env .env
+          mkdir -p configs
+          mkdir -p certs
 
           node test/openode_api.js &
           sleep 5
