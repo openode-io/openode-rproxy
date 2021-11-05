@@ -2,15 +2,14 @@ version: '3'
 
 services:
   traefik:
+    network_mode: "host"
     # The official v2 Traefik docker image
     image: traefik:v2.5
     # Enables the web UI and tells Traefik to listen to docker
-    ports:
-      # The HTTP port
-      - "80:80"
-      - "443:443"
-      # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
+    #ports:
+    #  - "80:80"
+    #  - "443:443"
+    #  - "8080:8080"
 
     volumes:
       - $PWD/traefik.yml:/etc/traefik/traefik.yml
@@ -18,6 +17,7 @@ services:
       - $PWD/certs/:/certs/
 
   rproxy:
+    network_mode: "host"
     image: ruby:3.0.2
     env_file:
       - ./.env

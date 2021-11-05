@@ -1,7 +1,10 @@
 
-<% if @website_location.dig("gcloud_ssl_cert_url") && 
-      @website_location.dig("gcloud_ssl_key_url")
+<% 
+has_tls = @website_location.dig("gcloud_ssl_cert_url") && 
+  @website_location.dig("gcloud_ssl_key_url")
 %>
+
+<% if has_tls %>
 tls:
   certificates:
     - certFile: /certs/<%= @website_location.dig("website_id") %>.cert
@@ -10,10 +13,25 @@ tls:
 
 http:
   routers:
+    <% if has_tls %>
     website-location-<%= @website_location["id"] %>-https:
       rule: "Host(<%= @website_location["hosts"].map { |h| "`#{h}`" }.join(", ") %>)"
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
+    <% end %>
+
+    router-1-http:
+      rule: "Host(<%= @website_location["hosts"].map { |h| "`#{h}`" }.join(", ") %>)"
+      entryPoints:
+        - web
+      service: "service-website-location-<%= @website_location["id"] %>"
+      #middlewares:
+      #  - https
+
+  middlewares:
+    https:
+        redirectScheme:
+          scheme: https
 
   services:
     service-website-location-<%= @website_location["id"] %>:

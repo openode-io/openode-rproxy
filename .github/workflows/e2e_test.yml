@@ -1,0 +1,34 @@
+name: End-to-end
+
+on:
+  push:
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      
+      -
+        name: boot
+        run: |
+          cp .test.env .env
+          mkdir -p configs
+          mkdir -p certs
+
+          ls -la
+
+          node test/openode_api.js &
+          sleep 5
+          docker-compose up -d --build
+          sleep 10
+
+          docker-compose logs
+          docker ps -a
+
+      - 
+        name: test http route
+        run: |
+
+          curl -H "Host: mytest.openode.io" localhost | grep "Innovative Functionnalities"
