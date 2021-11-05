@@ -105,6 +105,7 @@ loop do
 
   openode_load_balancer_requiring_sync.each do |website_location|
     wl = website_location
+    puts "wl = #{wl.inspect}"
 
     sync_certs(wl)
 

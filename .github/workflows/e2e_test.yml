@@ -16,6 +16,14 @@ jobs:
           cp .test.env .env
 
           docker-compose up -d --build
+          node test/openode_api.js &
           sleep 10
 
+          docker-compose logs
           docker ps -a
+
+      - 
+        name: test http route
+        run: |
+
+          curl -H "Host: mytest.openode.io" localhost | grep "Innovative Functionnalities"
