@@ -17,6 +17,8 @@ jobs:
           mkdir -p configs
           mkdir -p certs
 
+          ls -la
+
           node test/openode_api.js &
           sleep 5
           docker-compose up -d --build
