@@ -19,6 +19,8 @@ http:
       rule: "Host(<%= @website_location["hosts"].map { |h| "`#{h}`" }.join(", ") %>)"
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
+      middlewares:
+        - rateLimitSite
     <% end %>
 
     website-location-<%= @website_location["id"] %>-http:
@@ -27,8 +29,9 @@ http:
         - web
       service: "service-website-location-<%= @website_location["id"] %>"
 
-      <% if [true, "true"].include?(@website_location["redir_http_to_https"]) %>
       middlewares:
+        - rateLimitSite
+      <% if [true, "true"].include?(@website_location["redir_http_to_https"]) %>
         - https
       <% end %>
 
@@ -36,6 +39,11 @@ http:
     https:
         redirectScheme:
           scheme: https
+    rateLimitSite:
+        rateLimit:
+          average: 80
+          burst: 50
+          period: 1s
 
   services:
     service-website-location-<%= @website_location["id"] %>:
