@@ -12,9 +12,9 @@ services:
     #  - "8080:8080"
 
     volumes:
-      - $PWD/traefik.yml:/etc/traefik/traefik.yml
-      - $PWD/configs/:/configs/
-      - $PWD/certs/:/certs/
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./configs/:/configs/
+      - ./certs/:/certs/
 
   rproxy:
     network_mode: "host"
@@ -27,5 +27,5 @@ services:
     command: "ruby server.rb"
 
     volumes:
-        - $PWD/configs/:/configs/
-        - $PWD/certs/:/certs/
+        - ./configs/:/configs/
+        - ./certs/:/certs/

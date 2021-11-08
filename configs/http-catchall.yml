@@ -1,0 +1,35 @@
+
+http:
+
+  routers:
+    router-catchall:
+      rule: hostregexp(`{host:.+}`)
+      service: "service-default"
+      entryPoints:
+        - websecure
+      middlewares:
+        - ratelimitglobal
+      tls: {}
+
+    router-catchall-http:
+      rule: hostregexp(`{host:.+}`)
+      service: "service-default"
+      entryPoints:
+        - web
+      middlewares:
+        - ratelimitglobal
+
+  services:
+    service-default:
+      loadBalancer:
+        passHostHeader: false
+        servers:
+        - url: "https://localhost:65000"
+
+  middlewares:
+    ratelimitglobal:
+        rateLimit:
+          average: 50
+          period: 10s
+
+
