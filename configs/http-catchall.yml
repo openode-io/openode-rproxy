@@ -8,7 +8,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - ratelimitglobal
+        - rateLimitGlobal
       tls: {}
 
     router-catchall-http:
@@ -17,7 +17,7 @@ http:
       entryPoints:
         - web
       middlewares:
-        - ratelimitglobal
+        - rateLimitGlobal
 
   services:
     service-default:
@@ -27,9 +27,10 @@ http:
         - url: "https://localhost:65000"
 
   middlewares:
-    ratelimitglobal:
+    rateLimitGlobal:
         rateLimit:
           average: 50
+          burst: 25
           period: 10s
 
 
