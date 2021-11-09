@@ -32,5 +32,3 @@ http:
           average: 50
           burst: 25
           period: 10s
-
-
