@@ -14,7 +14,7 @@ const server = http.createServer(function (req, res) {
     }
     else if (req.url === '/super_admin/website_locations/online/gcloud_run') {
         res.end(
-            `[{"hosts": ["myboottest.openode.io"], "id": 11, "website_id": 1000, "backend_url": "https://raw.githubusercontent.com/openode-io/openode-rproxy/master/server.rb"}]`
+            `[{"hosts": ["myboottest.openode.io"], "id": 11, "website_id": 1000, "backend_url": "https://api.openode.io/"}]`
         );
     }
     else if (req.url === '/super_admin/website_locations/10') {

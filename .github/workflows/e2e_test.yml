@@ -37,4 +37,4 @@ jobs:
         name: test http from boot configs
         run: |
 
-          curl -H "Host: myboottest.openode.io" localhost | grep "LOOP_SYNC_INTERVAL"
+          curl -H "Host: myboottest.openode.io" localhost | grep "{}"
