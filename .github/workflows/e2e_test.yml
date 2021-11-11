@@ -28,7 +28,13 @@ jobs:
           docker ps -a
 
       - 
-        name: test http route
+        name: test http from load balancer route
         run: |
 
           curl -H "Host: mytest.openode.io" localhost | grep "Innovative Functionnalities"
+
+      - 
+        name: test http from boot configs
+        run: |
+
+          curl -H "Host: myboottest.openode.io" localhost | grep "{}"

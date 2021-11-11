@@ -62,6 +62,10 @@ def openode_load_balancer_requiring_sync
   openode_get("/super_admin/website_locations/load_balancer_requiring_sync")
 end
 
+def openode_all_sites_online_gcloud_run
+  openode_get("/super_admin/website_locations/online/gcloud_run")
+end
+
 def openode_set_load_balancer_synced(website_location_id)
   openode_patch(
     "/super_admin/website_locations/#{website_location_id}",
@@ -100,12 +104,10 @@ end
 
 log("Booting with sync interval #{LOOP_SYNC_INTERVAL}")
 
-loop do
-  log("Begin loop")
-
-  openode_load_balancer_requiring_sync.each do |website_location|
+def sync_website_locations(website_locations, with_set_load_balancer_synced = false)
+  website_locations.each do |website_location|
     wl = website_location
-    puts "wl = #{wl.inspect}"
+    log "Sync of #{wl["hosts"]}"
 
     sync_certs(wl)
 
@@ -119,8 +121,19 @@ loop do
     File.open(file_path, 'w') { |file| file.write(data) }
     log("[+] Wrote #{file_path}")
 
-    openode_set_load_balancer_synced(website_location_id)
+    openode_set_load_balancer_synced(website_location_id) if with_set_load_balancer_synced
   end
+end
+
+# On boot, do a global sync
+initial_website_locations = openode_all_sites_online_gcloud_run
+sync_website_locations(initial_website_locations, false)
+initial_website_locations = nil
+
+loop do
+  log("Begin loop")
+
+  sync_website_locations(openode_load_balancer_requiring_sync, true)
 
   sleep LOOP_SYNC_INTERVAL
 rescue StandardError => e
