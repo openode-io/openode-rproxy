@@ -132,7 +132,7 @@ def sync_website_locations(website_locations, with_set_load_balancer_synced = fa
 end
 
 def sync_clean_inactive_website_locations(website_locations)
-  config_filenames = Dir.entries("./configs")
+  config_filenames = Dir.entries(CONFIGS_PATH)
 
   website_location_filenames = website_locations.map { |wl| config_filename(wl) }
   filenames_ok = ["http-catchall.yml", ".", ".."] + website_location_filenames
