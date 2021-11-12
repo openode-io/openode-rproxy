@@ -17,6 +17,8 @@ jobs:
           mkdir -p configs
           mkdir -p certs
 
+          echo "dummy" > configs/dummyfile
+
           ls -la
 
           node test/openode_api.js &
@@ -38,3 +40,12 @@ jobs:
         run: |
 
           curl -H "Host: myboottest.openode.io" localhost | grep "{}"
+
+      - 
+        name: check removed dummy file in configs
+        run: |
+          if test -f "./configs/dummyfile"; then
+              echo "dummyfile exists."
+              exit 1
+          fi
+          
