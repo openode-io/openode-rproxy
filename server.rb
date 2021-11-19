@@ -10,6 +10,7 @@ OPENODE_API_TOKEN = ENV["OPENODE_API_TOKEN"]
 GSTORAGE_BUCKET = ENV["GSTORAGE_BUCKET"] || "gs://instance-certs"
 LOCAL_CERTS_PATH = ENV["LOCAL_CERTS_PATH"] || "./certs"
 CONFIGS_PATH = ENV["CONFIGS_PATH"] || "./configs"
+LOCATION_STR_ID = ENV["LOCATION_STR_ID"] || "invalid"
 
 ### General utils
 
@@ -59,11 +60,15 @@ def openode_patch(path, body)
 end
 
 def openode_load_balancer_requiring_sync
-  openode_get("/super_admin/website_locations/load_balancer_requiring_sync")
+  openode_get(
+    "/super_admin/website_locations/load_balancer_requiring_sync?location=#{LOCATION_STR_ID}"
+  )
 end
 
 def openode_all_sites_online_gcloud_run
-  openode_get("/super_admin/website_locations/online/gcloud_run")
+  openode_get(
+    "/super_admin/website_locations/online/gcloud_run?location=#{LOCATION_STR_ID}"
+  )
 end
 
 def openode_set_load_balancer_synced(website_location_id)
