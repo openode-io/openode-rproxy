@@ -18,6 +18,7 @@ jobs:
           mkdir -p certs
 
           echo "dummy" > configs/dummyfile
+          echo "dummy" > certs/dummyfile2
 
           ls -la
 
@@ -46,6 +47,14 @@ jobs:
         run: |
           if test -f "./configs/dummyfile"; then
               echo "dummyfile exists."
+              exit 1
+          fi
+
+      - 
+        name: check removed dummy file in certs
+        run: |
+          if test -f "./certs/dummyfile2"; then
+              echo "dummyfile2 exists."
               exit 1
           fi
           

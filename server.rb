@@ -147,9 +147,34 @@ def sync_clean_inactive_website_locations(website_locations)
   end
 end
 
+def sync_clean_inactive_website_location_certs(website_locations)
+  cert_filenames = Dir.entries(LOCAL_CERTS_PATH)
+
+  expected_filenames = website_locations.map do |wl|
+    [
+      "#{wl["website_id"]}.cert",
+      "#{wl["website_id"]}.key",
+    ]
+  end
+
+  filenames_ok = ([".", ".."] + expected_filenames).flatten
+
+  filenames_to_remove = cert_filenames - filenames_ok
+
+  filenames_to_remove.each do |filename_to_remove|
+    filepath = "#{LOCAL_CERTS_PATH}/#{filename_to_remove}"
+    log "Removing cert #{filepath}"
+
+    File.delete(filepath)
+  end
+end
+
 # On boot, do a global sync
 initial_website_locations = openode_all_sites_online_gcloud_run
+
 sync_clean_inactive_website_locations(initial_website_locations)
+sync_clean_inactive_website_location_certs(initial_website_locations)
+
 sync_website_locations(initial_website_locations, false)
 initial_website_locations = nil
 
