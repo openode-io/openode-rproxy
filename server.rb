@@ -80,7 +80,6 @@ end
 # gstorage
 
 def gstorage_cp(from, to)
-  #system("gsutil cp #{GSTORAGE_BUCKET}/167.cert #{LOCAL_CERTS_PATH}/167.cert")
   cmd = "gsutil cp #{from} #{to}"
   log("gstorage: #{cmd}")
 
