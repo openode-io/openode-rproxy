@@ -12,6 +12,10 @@ LOCAL_CERTS_PATH = ENV["LOCAL_CERTS_PATH"] || "./certs"
 CONFIGS_PATH = ENV["CONFIGS_PATH"] || "./configs"
 LOCATION_STR_ID = ENV["LOCATION_STR_ID"] || "invalid"
 
+CLOUDFLARE_API_TOKEN = ENV["CLOUDFLARE_API_TOKEN"]
+CLOUDFLARE_ZONE = ENV["CLOUDFLARE_ZONE"]
+CLOUDFLARE_API_URL = ENV["CLOUDFLARE_API_URL"] || "https://api.cloudflare.com/client/v4"
+
 ### General utils
 
 def log(msg)
@@ -34,6 +38,12 @@ def http_patch(url, body, headers = nil)
   uri = URI(url)
 
   HTTParty.patch(url, :headers => headers, body: body).body
+end
+
+def http_post(url, body, headers = nil)
+  uri = URI(url)
+
+  HTTParty.post(url, :headers => headers, body: body).body
 end
 
 # openode
@@ -79,6 +89,29 @@ def openode_set_load_balancer_synced(website_location_id)
         "load_balancer_synced" => true
       }
     }
+  )
+end
+
+# cloudflare
+
+def cloudflare_get(path)
+  return JSON.parse(
+    http_get(
+      "#{CLOUDFLARE_API_URL}#{path}",
+      headers={"Authorization: " => "Bearer #{CLOUDFLARE_API_TOKEN}"}
+    )
+  )
+end
+
+def cloudflare_post(path, body)
+  log("Cloudflare post #{path}")
+
+  return JSON.parse(
+    http_post(
+      "#{CLOUDFLARE_API_URL}#{path}",
+      body,
+      headers={"Authorization: " => "Bearer #{CLOUDFLARE_API_TOKEN}"}
+    )
   )
 end
 
@@ -130,6 +163,22 @@ def sync_website_locations(website_locations, with_set_load_balancer_synced = fa
     file_path = "#{CONFIGS_PATH}/#{config_filename(wl)}"
     File.open(file_path, 'w') { |file| file.write(data) }
     log "[+] Wrote #{file_path}"
+
+    if wl["domain_type"] == "subdomain" && ENV["WITH_CLOUDFLARE_SYNC"].to_s == "true"
+      # check if we should create the dns record
+      host = wl["hosts"].first
+      dns_record = cloudflare_get("/zones/#{CLOUDFLARE_ZONE}/dns_records?name=#{host}")
+
+      if dns_record&.dig("result_info")&.dig("count")&.zero?
+        new_dns_record = {
+          "type" => "CNAME",
+          "name" => host,
+          "content" => wl["cname"],
+          "proxied" => true
+        }
+        cloudflare_post("/zones/#{CLOUDFLARE_ZONE}/dns_records", new_dns_record)
+      end
+    end
 
     openode_set_load_balancer_synced(website_location_id) if with_set_load_balancer_synced
   end
