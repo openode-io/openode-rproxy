@@ -98,7 +98,7 @@ def cloudflare_get(path)
   return JSON.parse(
     http_get(
       "#{CLOUDFLARE_API_URL}#{path}",
-      headers={"Authorization: " => "Bearer #{CLOUDFLARE_API_TOKEN}"}
+      headers={"Authorization" => "Bearer #{CLOUDFLARE_API_TOKEN}"}
     )
   )
 end
@@ -109,8 +109,11 @@ def cloudflare_post(path, body)
   return JSON.parse(
     http_post(
       "#{CLOUDFLARE_API_URL}#{path}",
-      body,
-      headers={"Authorization: " => "Bearer #{CLOUDFLARE_API_TOKEN}"}
+      body.to_json,
+      headers={
+        "Authorization" => "Bearer #{CLOUDFLARE_API_TOKEN}",
+        "Content-Type" => "application/json"
+      }
     )
   )
 end
