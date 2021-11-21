@@ -164,13 +164,12 @@ def sync_website_locations(website_locations, with_set_load_balancer_synced = fa
     File.open(file_path, 'w') { |file| file.write(data) }
     log "[+] Wrote #{file_path}"
 
-    if wl["domain_type"] == "subdomain"
+    if wl["domain_type"] == "subdomain" && ENV["WITH_CLOUDFLARE_SYNC"].to_s == "true"
       # check if we should create the dns record
       host = wl["hosts"].first
       dns_record = cloudflare_get("/zones/#{CLOUDFLARE_ZONE}/dns_records?name=#{host}")
 
-      if dns_record&.dig("result_info")&.dig("count")&.zero? &&
-        ENV["WITH_CLOUDFLARE_SYNC"].to_s == "true"
+      if dns_record&.dig("result_info")&.dig("count")&.zero?
         new_dns_record = {
           "type" => "CNAME",
           "name" => host,
