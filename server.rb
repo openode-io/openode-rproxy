@@ -104,10 +104,25 @@ def cloudflare_get(path)
 end
 
 def cloudflare_post(path, body)
-  log("Cloudflare post #{path}")
+  log("Cloudflare post #{path}, body=#{body.inspect}")
 
   return JSON.parse(
     http_post(
+      "#{CLOUDFLARE_API_URL}#{path}",
+      body.to_json,
+      headers={
+        "Authorization" => "Bearer #{CLOUDFLARE_API_TOKEN}",
+        "Content-Type" => "application/json"
+      }
+    )
+  )
+end
+
+def cloudflare_put(path, body)
+  log("Cloudflare put #{path}, body=#{body.inspect}")
+
+  return JSON.parse(
+    http_put(
       "#{CLOUDFLARE_API_URL}#{path}",
       body.to_json,
       headers={
@@ -172,14 +187,25 @@ def sync_website_locations(website_locations, with_set_load_balancer_synced = fa
       host = wl["hosts"].first
       dns_record = cloudflare_get("/zones/#{CLOUDFLARE_ZONE}/dns_records?name=#{host}")
 
+      dns_record_update = {
+        "type" => "CNAME",
+        "name" => host,
+        "content" => wl["cname"],
+        "proxied" => true
+      }
+
       if dns_record&.dig("result_info")&.dig("count")&.zero?
-        new_dns_record = {
-          "type" => "CNAME",
-          "name" => host,
-          "content" => wl["cname"],
-          "proxied" => true
-        }
-        cloudflare_post("/zones/#{CLOUDFLARE_ZONE}/dns_records", new_dns_record)
+        cloudflare_post("/zones/#{CLOUDFLARE_ZONE}/dns_records", dns_record_update)
+      else
+        # need to update
+        record_id = dns_record&.dig("result").first&.dig("id")
+
+        if record_id
+          cloudflare_put(
+            "/zones/#{CLOUDFLARE_ZONE}/dns_records/#{record_id}",
+            dns_record_update
+          )
+        end
       end
     end
 
