@@ -21,7 +21,7 @@ jobs:
 
           # ssh setup
           mkdir .ssh
-          echo $PK_US_CENTRAL_1_B64 | base64 -d > .ssh/main_server_pk
+          echo $PK_EU_WEST_1_B64 | base64 -d > .ssh/main_server_pk
           chmod 400 .ssh/main_server_pk
           ssh_in="ssh -o StrictHostKeyChecking=no -i .ssh/main_server_pk $EU_WEST_1_USERNAME@$EU_WEST_1_HOST"
 
