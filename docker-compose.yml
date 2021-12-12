@@ -31,3 +31,4 @@ services:
     volumes:
         - ./configs/:/configs/
         - ./certs/:/certs/
+        - ~/.config/gcloud:/root/.config/gcloud
