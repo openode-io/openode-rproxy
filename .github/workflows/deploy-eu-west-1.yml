@@ -13,7 +13,7 @@ jobs:
       -
         name: deploy
         env:
-          PK_US_CENTRAL_1_B64: ${{secrets.PK_EU_WEST_1_B64}}
+          PK_EU_WEST_1_B64: ${{secrets.PK_EU_WEST_1_B64}}
           US_CENTRAL_1_HOST: ${{secrets.EU_WEST_1_HOST}}
           US_CENTRAL_1_USERNAME: ${{secrets.EU_WEST_1_USERNAME}}
         run: |
