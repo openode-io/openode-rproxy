@@ -14,8 +14,8 @@ jobs:
         name: deploy
         env:
           PK_EU_WEST_1_B64: ${{secrets.PK_EU_WEST_1_B64}}
-          US_CENTRAL_1_HOST: ${{secrets.EU_WEST_1_HOST}}
-          US_CENTRAL_1_USERNAME: ${{secrets.EU_WEST_1_USERNAME}}
+          EU_WEST_1_HOST: ${{secrets.EU_WEST_1_HOST}}
+          EU_WEST_1_USERNAME: ${{secrets.EU_WEST_1_USERNAME}}
         run: |
           go_home="cd /var/www/openode-rproxy"
 
