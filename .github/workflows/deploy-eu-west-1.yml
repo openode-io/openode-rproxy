@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      -
+        name: deploy
+        env:
+          PK_US_CENTRAL_1_B64: ${{secrets.PK_EU_WEST_1_B64}}
+          US_CENTRAL_1_HOST: ${{secrets.EU_WEST_1_HOST}}
+          US_CENTRAL_1_USERNAME: ${{secrets.EU_WEST_1_USERNAME}}
+        run: |
+          go_home="cd /var/www/openode-rproxy"
+
+          # ssh setup
+          mkdir .ssh
+          echo $PK_US_CENTRAL_1_B64 | base64 -d > .ssh/main_server_pk
+          chmod 400 .ssh/main_server_pk
+          ssh_in="ssh -o StrictHostKeyChecking=no -i .ssh/main_server_pk $EU_WEST_1_USERNAME@$EU_WEST_1_HOST"
+
+          $ssh_in "$go_home ; git pull"
+          $ssh_in "$go_home ; sudo docker-compose build"
+          $ssh_in "$go_home ; sudo docker-compose up -d"
