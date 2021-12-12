@@ -46,6 +46,12 @@ def http_post(url, body, headers = nil)
   HTTParty.post(url, :headers => headers, body: body).body
 end
 
+def http_put(url, body, headers = nil)
+  uri = URI(url)
+
+  HTTParty.put(url, :headers => headers, body: body).body
+end
+
 # openode
 
 def openode_get(path)
