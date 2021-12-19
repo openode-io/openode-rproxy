@@ -52,6 +52,12 @@ def http_put(url, body, headers = nil)
   HTTParty.put(url, :headers => headers, body: body).body
 end
 
+def http_delete(url, headers = nil)
+  uri = URI(url)
+
+  HTTParty.delete(url, :headers => headers).body
+end
+
 # openode
 
 def openode_get(path)
@@ -131,6 +137,20 @@ def cloudflare_put(path, body)
     http_put(
       "#{CLOUDFLARE_API_URL}#{path}",
       body.to_json,
+      headers={
+        "Authorization" => "Bearer #{CLOUDFLARE_API_TOKEN}",
+        "Content-Type" => "application/json"
+      }
+    )
+  )
+end
+
+def cloudflare_delete(path)
+  log("Cloudflare delete #{path}")
+
+  return JSON.parse(
+    http_delete(
+      "#{CLOUDFLARE_API_URL}#{path}",
       headers={
         "Authorization" => "Bearer #{CLOUDFLARE_API_TOKEN}",
         "Content-Type" => "application/json"
@@ -257,20 +277,62 @@ def sync_clean_inactive_website_location_certs(website_locations)
   end
 end
 
-# On boot, do a global sync
-initial_website_locations = openode_all_sites_online_gcloud_run
+def clean_cloudflare(options = {})
+  log "cleaning quick cloudflare..."
 
-sync_clean_inactive_website_locations(initial_website_locations)
-sync_clean_inactive_website_location_certs(initial_website_locations)
+  number_to_clean = options[:number_to_clean]
+  records_result = cloudflare_get("/zones/#{CLOUDFLARE_ZONE}/dns_records")
+  records = records_result["result"]
 
-sync_website_locations(initial_website_locations, false)
-initial_website_locations = nil
+  log "#{records.count} records in cloudflare"
+
+  (1..number_to_clean).each do |i|
+    record = records.sample
+
+    zone_name = record["zone_name"]
+    dns_record_id = record["id"]
+
+    site_name = record["name"].gsub(".#{zone_name}", "")
+
+    log "checking site #{site_name}..."
+
+    instance = openode_get("/instances/#{site_name}")
+    status = instance["status"]
+
+    log "  site is #{status}..."
+
+    if status == "N/A" || status.nil?
+      path_delete = "/zones/#{CLOUDFLARE_ZONE}/dns_records/#{dns_record_id}"
+
+      log "Removing #{site_name} from cloudflare. dns record id #{path_delete}"
+      cloudflare_delete(path_delete)
+    end
+  end
+rescue StandardError => e
+  log_error("#{e}, #{e.backtrace}")
+end
+
+def boot_up()
+  log "Booting"
+  # On boot, do a global sync
+  initial_website_locations = openode_all_sites_online_gcloud_run
+
+  sync_clean_inactive_website_locations(initial_website_locations)
+  sync_clean_inactive_website_location_certs(initial_website_locations)
+
+  sync_website_locations(initial_website_locations, false)
+  initial_website_locations = nil
+end
+
+boot_up
 
 loop do
   log("Begin loop")
 
   sync_website_locations(openode_load_balancer_requiring_sync, true)
+  clean_cloudflare(number_to_clean: 1)
 
+  log "waiting #{LOOP_SYNC_INTERVAL} seconds"
   sleep LOOP_SYNC_INTERVAL
 rescue StandardError => e
   log_error("#{e}, #{e.backtrace}")
