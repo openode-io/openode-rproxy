@@ -308,6 +308,8 @@ def clean_cloudflare(options = {})
       cloudflare_delete(path_delete)
     end
   end
+rescue StandardError => e
+  log_error("#{e}, #{e.backtrace}")
 end
 
 def boot_up()
