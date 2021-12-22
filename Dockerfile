@@ -2,6 +2,8 @@ FROM ruby:3.0.3-slim
 
 WORKDIR /app
 
+RUN apt-get update; apt-get install curl
+
 RUN curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
 
 # Installing the package
