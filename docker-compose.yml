@@ -20,7 +20,7 @@ services:
   rproxy:
     restart: always
     network_mode: "host"
-    image: ruby:3.0.3
+    image: rproxy:3.0.3
     env_file:
       - ./.env
     build:
