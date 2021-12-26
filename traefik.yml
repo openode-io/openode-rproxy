@@ -14,7 +14,7 @@ api:
   insecure: false
 
 log:
-  level: INFO
+  level: DEBUG
 
 http:
   middlewares:
