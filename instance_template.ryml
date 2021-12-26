@@ -20,7 +20,7 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
       middlewares:
-        - rateLimitSite
+        - rateLimitSite<%= @website_location["id"] %>
     <% end %>
 
     website-location-<%= @website_location["id"] %>-http:
@@ -30,20 +30,17 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
 
       middlewares:
-        - rateLimitSite
+        - rateLimitSite<%= @website_location["id"] %>
       <% if [true, "true"].include?(@website_location["redir_http_to_https"]) %>
         - https
       <% end %>
 
   middlewares:
-    https:
-        redirectScheme:
-          scheme: https
-    rateLimitSite:
+    rateLimitSite<%= @website_location["id"] %>:
         rateLimit:
-          average: 80
+          average: 2000
           burst: 50
-          period: 1s
+          period: 60m
 
   services:
     service-website-location-<%= @website_location["id"] %>:

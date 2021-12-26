@@ -12,6 +12,11 @@ services:
     #  - "443:443"
     #  - "8080:8080"
 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+
     volumes:
       - ./traefik.yml:/etc/traefik/traefik.yml
       - ./configs/:/configs/
@@ -27,6 +32,10 @@ services:
       context: .
 
     command: "ruby server.rb"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
 
     volumes:
         - ./configs/:/configs/
