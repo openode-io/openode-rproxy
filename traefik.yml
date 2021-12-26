@@ -22,6 +22,9 @@ http:
       buffering:
         maxResponseBodyBytes: 10000000
         maxRequestBodyBytes: 10000000
+    https:
+        redirectScheme:
+          scheme: https
 
     #redirecttohttps:
     #  redirectScheme:
