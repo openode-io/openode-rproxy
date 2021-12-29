@@ -45,7 +45,7 @@ http:
   services:
     service-website-location-<%= @website_location["id"] %>:
       loadBalancer:
-        passHostHeader: false
+        passHostHeader: <%= @website_location["execution_layer"] == "kubernetes" ? "true" : "false" %>
         servers:
         - url: "<%= @website_location["backend_url"] %>"
 
