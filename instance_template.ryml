@@ -20,6 +20,7 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
       middlewares:
+        - injectedHeaders<%= @website_location["id"] %>
         - rateLimitSite<%= @website_location["id"] %>
     <% end %>
 
@@ -30,12 +31,18 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
 
       middlewares:
+        - injectedHeaders<%= @website_location["id"] %>
         - rateLimitSite<%= @website_location["id"] %>
       <% if [true, "true"].include?(@website_location["redir_http_to_https"]) %>
         - https
       <% end %>
 
   middlewares:
+    injectedHeaders<%= @website_location["id"] %>:
+        headers:
+          customResponseHeaders:
+            Access-Control-Allow-Origin: "*"
+            Access-Control-Allow-Methods: "*"
     rateLimitSite<%= @website_location["id"] %>:
         rateLimit:
           average: 2000
