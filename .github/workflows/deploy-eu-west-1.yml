@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy eu-west-1
 
 on:
   push:
