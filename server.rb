@@ -312,25 +312,41 @@ rescue StandardError => e
   log_error("#{e}, #{e.backtrace}")
 end
 
-def boot_up()
-  log "Booting"
-  # On boot, do a global sync
+def sync_clean()
+  log "sync_clean in progress"
   initial_website_locations = openode_all_sites_online_gcloud_run
 
   sync_clean_inactive_website_locations(initial_website_locations)
   sync_clean_inactive_website_location_certs(initial_website_locations)
+
+  log "sync_clean done"
+
+  initial_website_locations
+end
+
+def boot_up()
+  log "Booting"
+  # On boot, do a global sync
+  initial_website_locations = sync_clean()
 
   sync_website_locations(initial_website_locations, false)
   initial_website_locations = nil
 end
 
 boot_up
+cnt_loops = 0
 
 loop do
-  log("Begin loop")
+  cnt_loops += 1
+
+  log("Begin loop ##{cnt_loops}")
 
   sync_website_locations(openode_load_balancer_requiring_sync, true)
   clean_cloudflare(number_to_clean: 1)
+
+  if cnt_loops % 50 == 0
+    sync_clean
+  end
 
   log "waiting #{LOOP_SYNC_INTERVAL} seconds"
   sleep LOOP_SYNC_INTERVAL
