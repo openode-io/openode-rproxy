@@ -23,6 +23,11 @@ jobs:
           ls -la
 
           node test/openode_api.js &
+
+          # setup http shaping
+          mkdir -p plugins-local/src/github.com/martinlevesque/http_shaping
+          git clone https://github.com/martinlevesque/http_shaping.git plugins-local/src/github.com/martinlevesque/http_shaping
+
           sleep 5
           docker-compose up -d --build
           sleep 10
