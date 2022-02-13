@@ -56,7 +56,7 @@ http:
           InTrafficLimit: 150MiB
           OutTrafficLimit: 150MiB
           LoopInterval: 1800
-          ConsiderLimits: false
+          ConsiderLimits: true
 
   services:
     service-website-location-<%= @website_location["id"] %>:
