@@ -20,7 +20,6 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
       tls: {}
       middlewares:
-        - httpShaping<%= @website_location["id"] %>
         - injectedHeaders<%= @website_location["id"] %>
         - rateLimitSite<%= @website_location["id"] %>
     <% end %>
@@ -32,7 +31,6 @@ http:
       service: "service-website-location-<%= @website_location["id"] %>"
 
       middlewares:
-        - httpShaping<%= @website_location["id"] %>
         - injectedHeaders<%= @website_location["id"] %>
         - rateLimitSite<%= @website_location["id"] %>
       <% if [true, "true"].include?(@website_location["redir_http_to_https"]) %>
@@ -50,13 +48,6 @@ http:
           average: 2000
           burst: 50
           period: 60m
-    httpShaping<%= @website_location["id"] %>:
-      plugin:
-        httpShaping:
-          InTrafficLimit: 150MiB
-          OutTrafficLimit: 150MiB
-          LoopInterval: 1800
-          ConsiderLimits: true
 
   services:
     service-website-location-<%= @website_location["id"] %>:

@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       -
-        name: deploy
+        name: deploy eu west 1
         env:
           PK_EU_WEST_1_B64: ${{secrets.PK_EU_WEST_1_B64}}
           EU_WEST_1_HOST: ${{secrets.EU_WEST_1_HOST}}

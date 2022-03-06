@@ -21,7 +21,6 @@ services:
       - ./traefik.yml:/etc/traefik/traefik.yml
       - ./configs/:/configs/
       - ./certs/:/certs/
-      - ./plugins-local/:/plugins-local/
 
   rproxy:
     restart: always
