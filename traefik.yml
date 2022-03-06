@@ -1,9 +1,4 @@
 
-experimental:
-  localPlugins:
-    httpShaping:
-      moduleName: github.com/martinlevesque/http_shaping
-
 providers:
   file:
     directory: /configs

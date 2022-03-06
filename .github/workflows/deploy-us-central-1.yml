@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       -
-        name: deploy
+        name: deploy us central 1
         env:
           PK_US_CENTRAL_1_B64: ${{secrets.PK_US_CENTRAL_1_B64}}
           US_CENTRAL_1_HOST: ${{secrets.US_CENTRAL_1_HOST}}
