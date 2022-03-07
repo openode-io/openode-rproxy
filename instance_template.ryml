@@ -52,7 +52,12 @@ http:
   services:
     service-website-location-<%= @website_location["id"] %>:
       loadBalancer:
+      <% if @website_location["traffic_limit_reached"] %>
+        passHostHeader: false
+        servers:
+        - url: "https://openodetest-us-central-1-kube.openode.dev/"
+      <% else %>
         passHostHeader: <%= @website_location["execution_layer"] == "kubernetes" ? "true" : "false" %>
         servers:
         - url: "<%= @website_location["backend_url"] %>"
-
+      <% end %>
